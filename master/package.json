@@ -1,0 +1,15 @@
+{
+  "name": "fxfurtrack",
+  "version": "1.0.0",
+  "description": "A distributed FurTrack scraper",
+  "main": "server.js",
+  "dependencies": {
+    "bee-queue": "^1.7.1",
+    "express": "^4.21.2",
+    "ioredis": "^5.5.0",
+    "puppeteer": "^24.3.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "uuid": "^11.1.0"
+  }
+}

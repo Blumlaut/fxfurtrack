@@ -1,0 +1,26 @@
+services:
+  master:
+    build: ./master
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+    environment:
+      - NODE_ENV=production
+    restart: always
+
+  worker:
+    build: ./worker
+    depends_on:
+      - redis
+    environment:
+      - NODE_ENV=production
+    deploy:
+      replicas: 5  # You can change the number of replicas to scale workers
+    restart: always
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    restart: always
