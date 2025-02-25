@@ -23,6 +23,10 @@ app.get('*', async (req, res) => {
     return res.status(400).send('URL is required');
   }
 
+  if (url == "/") {
+    return res.status(200).send("Change the domain to a Furtrack image to 'fxfurtrack' to get proper embeds, source code is available: <a href='https://github.com/Blumlaut/fxfurtrack'>here</a>")
+  }
+
   // ignore URLs that dont start with either /p/, /user/ or /index/
   if (!url.match(/^\/(p|user|index)/)) {
     return res.status(400).send('Invalid URL');
