@@ -1,6 +1,4 @@
 const Bee = require('bee-queue');
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const Redis = require('ioredis');
 const https = require('https');
 
@@ -28,37 +26,19 @@ const httpAgent = new https.Agent({
     maxVersion: 'TLSv1.3'
 });
 
-queue.on('job succeeded', (job, result) => {
-    // console.log(`Job ${job.id} succeeded with result:`, result);
-});
-
-puppeteer.use(StealthPlugin());
-
-let browser;
-
-const initBrowser = async () => {
-    console.log('Launching browser...');
-    browser = await puppeteer.launch({
-        headless: 'new',
-        dumpio: true,
-        protocolTimeout: 10000,
-        args: [
-            '--no-sandbox',
-            '--disable-gpu',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--single-process'
-        ],
-    });
-    console.log('Browser launched');
-};
-
-const closeBrowser = async () => {
-    if (browser) {
-        await browser.close();
-        console.log('Browser closed');
-    }
-};
+const fetchParameters = {
+    "credentials": "include",
+    "headers": {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0",
+        "Accept": "application/json, text/plain, */*",
+        "Referer": "https://www.furtrack.com/",
+        "Origin": "https://www.furtrack.com",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Authorization": "Bearer " + process.env.TOKEN,
+    },
+    "method": "GET",
+    "agent": httpAgent
+}
 
 queue.process(async (job) => {
     const url = job.data.url.replace('/uploads/', '/photography/');
@@ -76,26 +56,15 @@ queue.process(async (job) => {
     var result
 
     // if url ends in a post ID (number) 
-    if (!isNaN(url.split('/').pop())) {
+    if (!isNaN(url.split('/').pop()) && url.split('/').pop() != "") {
         
         const postId = url.split('/').pop();
         console.log('Fetching metadata for post ID', postId);
-        let response = await fetch(`https://solar.furtrack.com/view/post/${postId}`, {
-            "credentials": "include",
-            "headers": {
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0",
-                "Accept": "application/json, text/plain, */*",
-                "Referer": "https://www.furtrack.com/",
-                "Origin": "https://www.furtrack.com",
-                "Accept-Language": "en-US,en;q=0.5",
-                "Authorization": "Bearer " + process.env.TOKEN,
-            },
-            "method": "GET",
-            "agent": httpAgent
-        });
+        let response = await fetch(`https://solar.furtrack.com/view/post/${postId}`, fetchParameters)
         if (!response.ok) {
-            throw new Error(`HTTP error! response: ${response}`);
+            return { status: 'error', message: 'No metadata found' };
         }
+
         const data = await response.json();
         console.log(`data is ${JSON.stringify(data)}`)
         const post = data.post;
@@ -143,18 +112,75 @@ queue.process(async (job) => {
 
         console.log("Data fetched successfully:", metadata);
         result = { url: `https://furtrack.com${url}`, metadata, twitter };
+    } else if (url.includes('/user/') && !url.includes("album")) {
+        // username is in the url directly /user/
+        const username = url.split('/user/')[1].split('/')[0];
+        let response = await fetch(`https://solar.furtrack.com/get/u/${username}`, fetchParameters)
+        if (!response.ok) {
+            return { status: 'error', message: 'No metadata found' };
+        }
+        const data = await response.json();
+        console.log(`data is ${JSON.stringify(data)}`)
+
+        // "photography" if url contains "photography", "fursuting" if contains "fursuiting"
+        let descriptionPageName = url.includes('photography') ? 'photography' : url.includes('fursuiting') ? 'fursuiting' : url.includes('likes') ? 'favorites' : '';
+        
+
+        metadata.push(
+            { property: "og:title", content: `${data.user.username}'s profile` },
+            { property: "og:description", content: `Check out ${data.user.username}'s ${descriptionPageName} gallery on Furtrack` },
+            { property: "og:site_name", content: "furtrack.com"},
+            { property: "og:type", content: "website"},
+            { property: "og:image", content: `https://orca.furtrack.com/icons/${data.user.userIcon}.jpg` }
+        );
+        twitter.push(
+            { name: "twitter:card", content: `${data.user.username}'s profile` }, 
+            { name: "twitter:description", content: `Check out ${data.user.username}'s ${descriptionPageName} gallery on Furtrack` }, 
+            { name: "twitter:image", content: `https://orca.furtrack.com/icons/${data.user.userIcon}.jpg` },
+            { name: "twitter:site", content: "@furtrack" }
+        );
+        result = { url: `https://furtrack.com${url}`, metadata, twitter };
+    } else if (url.includes("album")) {
+        const username = url.split('/user/')[1].split('/')[0];
+        const albumId = url.split('-').pop();
+        console.log("processing album")
+        let userData = await fetch(`https://solar.furtrack.com/get/u/${username}`, fetchParameters)
+        if (!userData.ok) {
+            return { status: 'error', message: 'No metadata found' };
+        }
+        const user = await userData.json();
+
+
+        let albumData = await fetch(`https://solar.furtrack.com/view/album/${username}/${albumId}`, fetchParameters)
+        if (!albumData.ok) {
+            return { status: 'error', message: 'No metadata found' };
+        }
+
+        const album = await albumData.json();
+
+        metadata.push(
+            { property: "og:title", content: `${user.user.username}'s ${album.album.albumTitle} album` },
+            { property: "og:description", content: `Check out ${user.user.username}'s ${album.album.albumTitle} album on Furtrack` },
+            { property: "og:site_name", content: "furtrack.com"},
+            { property: "og:type", content: "website"},
+            { property: "og:image", content: `https://orca.furtrack.com/icons/${user.user.userIcon}.jpg` }
+        );
+        twitter.push(
+            { name: "twitter:card", content: `${user.user.username}'s ${album.album.albumTitle} album`  }, 
+            { name: "twitter:description", content: `Check out ${user.user.username}'s ${album.album.albumTitle} album on Furtrack` }, 
+            { name: "twitter:image", content: `https://orca.furtrack.com/icons/${user.user.userIcon}.jpg` },
+            { name: "twitter:site", content: "@furtrack" }
+        );
+        result = { url: `https://furtrack.com${url}`, metadata, twitter };
     }
+        
 
     if (!result) {
-        throw new Error("Failed to fetch metadata");
+        return { status: 'error', message: 'No metadata found' };
     }
     // Cache result in Redis for 24 hours
     await redisClient.setex(url, 86400, JSON.stringify(result));
     
     console.log('Metadata cached');
     return result;
-});
-
-queue.on('drained', async () => {
-    await closeBrowser();
 });

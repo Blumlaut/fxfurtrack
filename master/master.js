@@ -34,6 +34,11 @@ app.get('*', async (req, res) => {
   const job = await queue.createJob({ url }).save()
 
   job.on('succeeded', (result) => {
+    if (result.status == "error")  {
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
     console.log(`Job ${job.id} succeeded with result: ${result.metadata}`);
     res.send(`
       <html>
