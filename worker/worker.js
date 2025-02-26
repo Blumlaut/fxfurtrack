@@ -86,7 +86,7 @@ queue.process(async (job) => {
             return tag.tagName ? [...tag.tagName.split(':')].pop() : null;
           });
 
-        if (characterNames.length == 1) {
+        if (characterNames.length != 1) {
             metadata.push({ property: 'og:title', content: `Photo by ${photographers[0]}`});
             twitter.push({ name: 'twitter:title', content: `Photo by ${photographers[0]}` });
         } else {
