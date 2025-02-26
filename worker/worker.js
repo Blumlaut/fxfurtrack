@@ -179,6 +179,23 @@ queue.process(async (job) => {
             { name: "twitter:site", content: "@furtrack" }
         );
         result = { url: `https://furtrack.com${url}`, metadata, twitter };
+    } else if (url.includes("/index/")) {
+        const tag = url.split("/index/")[1];
+        const tagName = capitalizeFirstLetter((tag.includes(':')) ? tag.split(':')[1] : tag)
+
+
+        const metadata = [
+            { property: "og:title", content: `${tagName} on Furtrack` },
+            { property: "og:description", content: `Check out ${tagName} on Furtrack` },
+            { property: "og:site_name", content: "furtrack.com"},
+            { property: "og:type", content: "website"}
+        ];
+        const twitter = [
+            { name: "twitter:card", content: `${tagName} on Furtrack`  }, 
+            { name: "twitter:description", content: `Check out ${tagName} on Furtrack` }, 
+            { name: "twitter:site", content: "@furtrack" }
+        ];
+        result = { url: `https://furtrack.com${url}`, metadata, twitter };
     }
         
 
