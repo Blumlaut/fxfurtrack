@@ -109,7 +109,7 @@ queue.process(async (job) => {
     
     await page.close();
     
-    const result = { metadata, twitter, title, description };
+    const result = { url: `https://furtrack.com${url}`, metadata, twitter, title, description };
 
     // Cache result in Redis for 24 hours
     await redisClient.setex(url, 86400, JSON.stringify(result));
