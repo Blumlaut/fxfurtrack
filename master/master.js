@@ -28,7 +28,7 @@ app.get('*', async (req, res) => {
 
   // ignore URLs that dont start with either /p/, /user/ or /index/
   if (!url.match(/^\/(p|user|index)/)) {
-    return res.status(400).send('Invalid URL');
+    return res.status(404).send('Invalid URL');
   }
 
   const job = await queue.createJob({ url }).save()
