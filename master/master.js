@@ -38,7 +38,7 @@ app.get('*', async (req, res) => {
     res.send(`
       <html>
         <head>
-          <title>${result.title}</title>
+          <title>FurTrack</title>
           ${result.metadata.map(tag => `<meta property="${tag.property}" content="${tag.content}">`).join('')}
           ${result.twitter.map(tag => `<meta name="${tag.name}" content="${tag.content}">`).join('')}
           
@@ -57,8 +57,6 @@ app.get('*', async (req, res) => {
           </style>
         </head>
         <body>
-          <h1>${result.title}</h1>
-          <p>${result.description}</p>
           <p><i>Redirecting...</i></p>
         </body>
       </html>

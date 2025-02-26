@@ -15,6 +15,7 @@ services:
       - redis
     environment:
       - NODE_ENV=production
+      - TOKEN=${TOKEN}
     deploy:
       replicas: 5  # You can change the number of replicas to scale workers
     restart: always
