@@ -34,11 +34,16 @@ app.get('*', async (req, res) => {
   const job = await queue.createJob({ url }).save()
 
   job.on('succeeded', (result) => {
+    if (result.status == "error")  {
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
     console.log(`Job ${job.id} succeeded with result: ${result.metadata}`);
     res.send(`
       <html>
         <head>
-          <title>${result.title}</title>
+          <title>FurTrack</title>
           ${result.metadata.map(tag => `<meta property="${tag.property}" content="${tag.content}">`).join('')}
           ${result.twitter.map(tag => `<meta name="${tag.name}" content="${tag.content}">`).join('')}
           
@@ -57,8 +62,6 @@ app.get('*', async (req, res) => {
           </style>
         </head>
         <body>
-          <h1>${result.title}</h1>
-          <p>${result.description}</p>
           <p><i>Redirecting...</i></p>
         </body>
       </html>
