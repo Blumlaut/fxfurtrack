@@ -80,7 +80,11 @@ queue.process(async (job) => {
 
         // filter all tags not beginning with "1:" or "3:", they are general tags
         const generalTags = tags.filter(tag => !tag.tagName || (!tag.tagName.startsWith('1:') && !tag.tagName.startsWith('3:')));
-        const generalTagNames = generalTags.map(tag => tag.tagName.split(':')[1]);
+
+        // if tags contain a :, split and only use the part after the :, otherwise use the tag itself
+        const generalTagNames = generalTags.map(tag => {
+            return tag.tagName ? [...tag.tagName.split(':')].pop() : null;
+          });
 
         if (characterNames.length == 1) {
             metadata.push({ property: 'og:title', content: `Photo by ${photographers[0]}`});
