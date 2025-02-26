@@ -40,6 +40,11 @@ const fetchParameters = {
     "agent": httpAgent
 }
 
+
+function capitalizeFirstLetter(val) {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
+
 queue.process(async (job) => {
     const url = job.data.url.replace('/uploads/', '/photography/');
     console.log('Processing job', `https://furtrack.com${url}`);
@@ -90,8 +95,8 @@ queue.process(async (job) => {
             metadata.push({ property: 'og:title', content: `Photo by ${photographers[0]}`});
             twitter.push({ name: 'twitter:title', content: `Photo by ${photographers[0]}` });
         } else {
-            metadata.push({ property: 'og:title', content: `${characterNames[0]} (📸 ${photographers[0]})`})
-            twitter.push({ name: 'twitter:title', content: `${characterNames[0]} (📸 ${photographers[0]})`});
+            metadata.push({ property: 'og:title', content: `${capitalizeFirstLetter(characterNames[0])} (📸 ${photographers[0]})`})
+            twitter.push({ name: 'twitter:title', content: `${capitalizeFirstLetter(characterNames[0])} (📸 ${photographers[0]})`});
         }
         let imageURL = `https://orca2.furtrack.com/gallery/${post.submitUserId}/${post.postId}-${post.metaFingerprint}.${post.metaFiletype}`; 
 
