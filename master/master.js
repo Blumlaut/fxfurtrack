@@ -42,16 +42,20 @@ app.get('*', async (req, res) => {
           <title>${result.title}</title>
           ${result.metadata.map(tag => `<meta property="${tag.property}" content="${tag.content}">`).join('')}
           ${result.twitter.map(tag => `<meta name="${tag.name}" content="${tag.content}">`).join('')}
-          <script>
-           window.onload = function() {
-              // redirect to furtrack with URL 
-              window.location.href = "https://furtrack.com"+window.location.pathname;
+          
+          <meta http-equiv="refresh" content="0; url=${result.url}" />
+
+          <style>
+            body {
+              font-family: sans-serif;
+              text-align: center;
             }
-          </script>
+          </style>
         </head>
         <body>
           <h1>${result.title}</h1>
           <p>${result.description}</p>
+          <p><i>Redirecting...</i></p>
         </body>
       </html>
     `);
