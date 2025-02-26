@@ -89,17 +89,20 @@ queue.process(async (job) => {
             return tag.tagName ? [...tag.tagName.split(':')].pop() : null;
           });
 
-        if (characterNames.length != 1) {
-            metadata.push({ property: 'og:title', content: `Photo by ${photographers[0]}`});
-            twitter.push({ name: 'twitter:title', content: `Photo by ${photographers[0]}` });
-        } else {
-            metadata.push({ property: 'og:title', content: `${capitalizeFirstLetter(characterNames[0])} (📸 @${photographers[0]})`})
-            twitter.push({ name: 'twitter:title', content: `${capitalizeFirstLetter(characterNames[0])} (📸 @${photographers[0]})`});
-        }
-        
         let imageURL = `https://orca2.furtrack.com/gallery/${post.submitUserId}/${post.postId}-${post.metaFingerprint}.${post.metaFiletype}`; 
+
         if (url.includes("video")) {
+            metadata.push({ property: 'og:title', content: `Video by ${photographers[0]}`});
+            twitter.push({ name: 'twitter:title', content: `Video by ${photographers[0]}` });
             imageURL = `https://orca2.furtrack.com/thumb/${post.postId}.jpg`
+        } else {
+            if (characterNames.length != 1) {
+                metadata.push({ property: 'og:title', content: `Photo by ${photographers[0]}`});
+                twitter.push({ name: 'twitter:title', content: `Photo by ${photographers[0]}` });
+            } else {
+                metadata.push({ property: 'og:title', content: `${capitalizeFirstLetter(characterNames[0])} (📸 @${photographers[0]})`})
+                twitter.push({ name: 'twitter:title', content: `${capitalizeFirstLetter(characterNames[0])} (📸 @${photographers[0]})`});
+            }
         }
 
         metadata.push(
