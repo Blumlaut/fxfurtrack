@@ -39,7 +39,7 @@ app.get('*', async (req, res) => {
       return;
     }
 
-    console.log(`Job ${job.id} succeeded with result: ${result.metadata}`);
+    console.log(`Job ${job.id} succeeded.`);
     res.send(`
       <html>
         <head>
