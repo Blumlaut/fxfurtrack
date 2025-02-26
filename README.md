@@ -5,7 +5,7 @@
 
 </div>
 
-This project provides a scraping service that extracts OpenGraph (OG) metadata from FurTrack pages. It uses a **Master-Worker** architecture where the master handles requests and workers run Puppeteer to fetch and extract metadata dynamically.
+This project provides a scraping service that extracts OpenGraph (OG) metadata from FurTrack pages. It uses a **Master-Worker** architecture where the master handles requests and workers to fetch and extract metadata dynamically.
 
 ---
 
@@ -22,7 +22,10 @@ git clone https://github.com/blumlaut/fxfurtrack.git
 cd fxfurtrack
 ```
 
-### **3. Start the Services**
+### **3. Configure Environment Variables**
+FurTrack **may** limit connections from non-logged in users, to ensure this does not happen fxfurtrack supports configuring your own Token in the `.env` file.
+
+### **4. Start the Services**
 Run the following command to build and start all services:
 ```bash
 docker compose up --build
