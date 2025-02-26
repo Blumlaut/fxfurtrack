@@ -183,6 +183,10 @@ queue.process(async (job) => {
         const tag = url.split("/index/")[1];
         const tagName = capitalizeFirstLetter((tag.includes(':')) ? tag.split(':')[1] : tag)
 
+        if (tag == "") {
+            return { status: 'error', message: 'Invalid Tag' };
+        }
+
 
         const metadata = [
             { property: "og:title", content: `${tagName} on Furtrack` },
