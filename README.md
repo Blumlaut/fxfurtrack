@@ -1,4 +1,4 @@
-<div style="align:center;">
+<div align="center">
 
 # FxFurTrack
 ## Embed FurTrack photos everywhere (fast)
