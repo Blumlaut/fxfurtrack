@@ -6,9 +6,6 @@
   "dependencies": {
     "bee-queue": "^1.7.1",
     "express": "^4.21.2",
-    "ioredis": "^5.5.0",
-    "puppeteer": "^24.3.0",
-    "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "ioredis": "^5.5.0"
   }
 }
