@@ -14,10 +14,6 @@ const queue = new Bee('metadata-extraction', {
     },
 });
 
-if (!process.env.TOKEN) {
-    throw new Error('Missing TOKEN environment variable, please add in your .env file');
-}
-
 const httpAgent = new https.Agent({
     rejectUnauthorized: false,
     ciphers: 'TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384',
@@ -33,11 +29,13 @@ const fetchParameters = {
         "Accept": "application/json, text/plain, */*",
         "Referer": "https://www.furtrack.com/",
         "Origin": "https://www.furtrack.com",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Authorization": "Bearer " + process.env.TOKEN,
+        "Accept-Language": "en-US,en;q=0.5"
     },
     "method": "GET",
     "agent": httpAgent
+}
+if (process.env.TOKEN) {
+    fetchParameters.headers['Authorization'] = 'Bearer ' + process.env.TOKEN;
 }
 
 
