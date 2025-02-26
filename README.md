@@ -31,8 +31,3 @@ This will start:
 - **Redis** (for job queuing and caching)
 - **Master API** (handles requests)
 - **Worker(s)** (scrape OpenGraph metadata using Puppeteer)
-
-To run with multiple workers:
-```bash
-docker compose up
-```
