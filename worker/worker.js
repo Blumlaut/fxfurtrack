@@ -96,15 +96,18 @@ queue.process(async (job) => {
             metadata.push({ property: 'og:title', content: `${capitalizeFirstLetter(characterNames[0])} (📸 @${photographers[0]})`})
             twitter.push({ name: 'twitter:title', content: `${capitalizeFirstLetter(characterNames[0])} (📸 @${photographers[0]})`});
         }
+        
         let imageURL = `https://orca2.furtrack.com/gallery/${post.submitUserId}/${post.postId}-${post.metaFingerprint}.${post.metaFiletype}`; 
-
+        if (url.includes("video")) {
+            imageURL = `https://orca2.furtrack.com/thumb/${post.postId}.jpg`
+        }
 
         metadata.push(
             { property: "og:description", content: `#${generalTagNames.join(' #')}`}, 
-            { property: "og:image", content: imageURL }, 
             { property: "og:type", content: "website"},
             { property: "og:site_name", content: "furtrack.com"},
             { property: "og:url", content: "https://furtrack.com/p/"+postId},
+            { property: "og:image", content: imageURL }, 
             { property: "og:image:width", content: post.metaWidth }, 
             { property: "og:image:height", content: post.metaHeight  }
         );
@@ -114,7 +117,6 @@ queue.process(async (job) => {
             { name: "twitter:image", content: imageURL },
             { name: "twitter:site", content: "@furtrack" }
         );
-
 
 
         console.log("Data fetched successfully:", metadata);
