@@ -34,5 +34,5 @@ This will start:
 
 To run with multiple workers:
 ```bash
-docker compose up --scale worker=5
+docker compose up
 ```
