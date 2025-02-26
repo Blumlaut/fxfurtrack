@@ -24,7 +24,7 @@ app.get('*', async (req, res) => {
   }
 
   if (url == "/") {
-    return res.status(200).send("Change the domain to a Furtrack image to 'fxfurtrack' to get proper embeds, source code is available: <a href='https://github.com/Blumlaut/fxfurtrack'>here</a>")
+    return res.status(200).send(`<html><head><meta http-equiv="refresh" content="0; url=https://github.com/Blumlaut/fxfurtrack" /></head><body>Redirecting to GitHub...</body></html>`)
   }
 
   // ignore URLs that dont start with either /p/, /user/ or /index/
