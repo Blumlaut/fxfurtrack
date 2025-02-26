@@ -44,7 +44,7 @@ app.get('*', async (req, res) => {
       <html>
         <head>
           <title>FurTrack</title>
-          <meta name="theme-color" content="#20152b">
+          <meta name="theme-color" content="#48166a">
           ${result.metadata.map(tag => `<meta property="${tag.property}" content="${tag.content}">`).join('')}
           ${result.twitter.map(tag => `<meta name="${tag.name}" content="${tag.content}">`).join('')}
           
