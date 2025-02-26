@@ -1,6 +1,12 @@
+<div style="text-align:center;">
+
 # FxFurTrack
+## Embed FurTrack photos everywhere (fast)
+
+</div>
 
 This project provides a scraping service that extracts OpenGraph (OG) metadata from FurTrack pages. It uses a **Master-Worker** architecture where the master handles requests and workers run Puppeteer to fetch and extract metadata dynamically.
+
 ---
 
 ## Installation & Setup
@@ -19,7 +25,7 @@ cd fxfurtrack
 ### **3. Start the Services**
 Run the following command to build and start all services:
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 This will start:
 - **Redis** (for job queuing and caching)
@@ -28,5 +34,5 @@ This will start:
 
 To run with multiple workers:
 ```bash
-docker-compose up --scale worker=5
+docker compose up --scale worker=5
 ```
