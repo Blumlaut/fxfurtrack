@@ -127,6 +127,10 @@ const generateTwitterMetadata = (title, description, imageURL = '') => [
 ];
 
 
+queue.on('failed', (job, err) => {
+    console.log(`Job ${job.id} failed with ${err.stack}`);
+});
+
 queue.process(async (job) => {
     const url = job.data.url.replace('/uploads/', '/photography/');
     console.log('Processing job', `https://furtrack.com${url}`);
