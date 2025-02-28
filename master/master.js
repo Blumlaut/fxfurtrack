@@ -17,7 +17,6 @@ app.use(express.json());
 
 app.get('*', async (req, res) => {
   const url = req.originalUrl;
-  console.log(req.originalUrl)
   if (!url) {
     return res.status(400).send('URL is required');
   }
@@ -30,6 +29,7 @@ app.get('*', async (req, res) => {
   if (!url.match(/^\/(p|user|index)/)) {
     return res.status(404).send('Invalid URL');
   }
+  console.log(req.originalUrl)
 
   const job = await queue.createJob({ url }).save()
 
