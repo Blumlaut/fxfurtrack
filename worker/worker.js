@@ -15,7 +15,7 @@ const httpAgent = new https.Agent({
 });
 
 const fetchHeaders = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0",
+    "User-Agent": "fxfurtrack.com (+https://fxfurtrack.com/); crawler for OpenGraph data Mozilla/5.0 (compatible; fxfurtrack/1.0)",
     "Accept": "application/json, text/plain, */*",
     "Referer": "https://www.furtrack.com/",
     "Origin": "https://www.furtrack.com",
