@@ -76,7 +76,9 @@ const processTagMetadata = async (url, tag) => {
     let imageURL
     let post
     if (posts.length >= 1) {
-        const postId = posts[0].postId;
+        const mostUpvotedPost = posts.reduce((max, obj) => (obj.cv > max.cv ? obj : max), posts[0]);
+        const postId = mostUpvotedPost.postId
+
         const data = await fetchJSON(`https://solar.furtrack.com/view/post/${postId}`)
         post = data.post
         imageURL = `https://orca2.furtrack.com/gallery/${post.submitUserId}/${post.postId}-${post.metaFingerprint}.${post.metaFiletype}`;
