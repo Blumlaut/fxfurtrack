@@ -163,7 +163,7 @@ queue.process(async (job) => {
         result = await processAlbumMetadata(url, username, albumId);
     } else if (url.includes("/index/")) {
         const tag = url.split("/index/")[1];
-        result = processTagMetadata(url, tag);
+        result = await processTagMetadata(url, tag);
     }
     
     if (!result) return { status: 'error', message: 'No metadata found' };
