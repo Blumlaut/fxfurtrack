@@ -118,8 +118,8 @@ const generateMetadata = (title, description, imageURL = '', post = {}, path = '
     { property: "og:url", content: `https://furtrack.com${path}` },
 ];
 
-const generateTwitterMetadata = (title, description, imageURL = '') => [
-    { name: "twitter:card", content: "summary_large_image" },
+const generateTwitterMetadata = (title, description, imageURL = '', cardType = 'summary_large_image') => [
+    { name: "twitter:card", content: cardType },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
     { name: "twitter:image", content: imageURL },
