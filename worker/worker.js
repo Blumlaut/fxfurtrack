@@ -68,13 +68,26 @@ const processPostMetadata = async (url) => {
 };
 
 
-const processTagMetadata = (url, tag) => {
-    if (!tag) return { status: 'error', message: 'Invalid Tag' };
-    const tagName = capitalize(tag.includes(':') ? tag.split(':')[1] : tag);
+const processTagMetadata = async (url, tag) => {
+    console.log('Fetching metadata for tag', tag);
+    const { posts, tagmeta } = await fetchJSON(`https://solar.furtrack.com/get/index/${tag}`);
+    let tagName = capitalize(tagmeta.tagTitle)
+
+    let imageURL
+    let post
+    if (posts.length >= 1) {
+        const postId = posts[0].postId;
+        const data = await fetchJSON(`https://solar.furtrack.com/view/post/${postId}`)
+        post = data.post
+        imageURL = `https://orca2.furtrack.com/gallery/${post.submitUserId}/${post.postId}-${post.metaFingerprint}.${post.metaFiletype}`;
+    }
+
+
+    if (!tagmeta) return { status: 'error', message: 'Invalid Tag' };
     return {
         url: `https://furtrack.com${url}`,
-        metadata: generateMetadata(`${tagName} on Furtrack`, `Check out ${tagName} on Furtrack`, {}, url),
-        twitter: generateTwitterMetadata(`${tagName} on Furtrack`, `Check out ${tagName} on Furtrack`)
+        metadata: generateMetadata(`${tagName} on Furtrack`, `Check out ${tagName} on Furtrack`, imageURL, post, url),
+        twitter: generateTwitterMetadata(`${tagName} on Furtrack`, `Check out ${tagName} on Furtrack`, imageURL, "summary")
     };
 };
 
