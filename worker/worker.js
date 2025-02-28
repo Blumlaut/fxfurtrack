@@ -71,8 +71,16 @@ const processPostMetadata = async (url) => {
 const processTagMetadata = async (url, tag) => {
     console.log('Fetching metadata for tag', tag);
     const { posts, tagmeta } = await fetchJSON(`https://solar.furtrack.com/get/index/${tag}`);
-    if (!tagmeta) return { status: 'error', message: 'Invalid Tag' };
-    let tagName = capitalize(tagmeta.tagTitle)
+    let tagName
+    if (tagmeta) {
+        tagName = capitalize(tagmeta.tagTitle)
+    } else if (tag.includes('+')) {
+        // if tag contains a "+", consider it multiple tags
+        const tags = tag.split('+');
+        tagName = tags.join(' + ')
+
+    }
+    if (!posts) return { status: 'error', message: 'Invalid Tag' };
 
     let imageURL
     let post
