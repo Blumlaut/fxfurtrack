@@ -59,6 +59,7 @@ app.get('*', async (req, res) => {
             body {
               font-family: sans-serif;
               text-align: center;
+              background-color: #19101e;
             }
           </style>
         </head>
