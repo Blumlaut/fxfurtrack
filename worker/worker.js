@@ -71,6 +71,7 @@ const processPostMetadata = async (url) => {
 const processTagMetadata = async (url, tag) => {
     console.log('Fetching metadata for tag', tag);
     const { posts, tagmeta } = await fetchJSON(`https://solar.furtrack.com/get/index/${tag}`);
+    if (!tagmeta) return { status: 'error', message: 'Invalid Tag' };
     let tagName = capitalize(tagmeta.tagTitle)
 
     let imageURL
@@ -85,7 +86,6 @@ const processTagMetadata = async (url, tag) => {
     }
 
 
-    if (!tagmeta) return { status: 'error', message: 'Invalid Tag' };
     return {
         url: `https://furtrack.com${url}`,
         metadata: generateMetadata(`${tagName} on Furtrack`, `Check out ${tagName} on Furtrack`, imageURL, post, url),
