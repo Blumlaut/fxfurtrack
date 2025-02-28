@@ -33,4 +33,4 @@ docker compose up --build
 This will start:
 - **Redis** (for job queuing and caching)
 - **Master API** (handles requests)
-- **Worker(s)** (scrape OpenGraph metadata using Puppeteer)
+- **Worker(s)** (retrieves OpenGraph metadata)
