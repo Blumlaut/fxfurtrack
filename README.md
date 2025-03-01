@@ -1,6 +1,7 @@
 <div align="center">
 
-# FxFurTrack
+<img src="master\public\assets\img\fxfurtrack.png" alt="FxFurTrack" height="90">
+
 ## Embed FurTrack photos everywhere (fast)
 
 </div>
@@ -34,3 +35,6 @@ This will start:
 - **Redis** (for job queuing and caching)
 - **Master API** (handles requests)
 - **Worker(s)** (retrieves OpenGraph metadata)
+
+## Disclaimer
+Please note that this project is not affiliated with or endorsed by FurTrack.
