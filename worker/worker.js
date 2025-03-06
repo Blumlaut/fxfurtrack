@@ -178,7 +178,7 @@ queue.process(async (job) => {
     } else if (url.includes("/index/")) {
         const tag = url.split("/index/")[1];
         result = await processTagMetadata(url, tag);
-    } else
+    }
     
     if (!result) return { status: 'error', message: 'No metadata found' };
     cacheResult(url, result);
