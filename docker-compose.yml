@@ -7,6 +7,9 @@ services:
       - redis
     environment:
       - NODE_ENV=production
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DB=${REDIS_DB}
     restart: always
 
   worker:
@@ -16,10 +19,12 @@ services:
     environment:
       - NODE_ENV=production
       - TOKEN=${TOKEN}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DB=${REDIS_DB}
     deploy:
       replicas: 2  # You can change the number of replicas to scale workers
     restart: always
-
   redis:
     image: "redis:alpine"
     ports:

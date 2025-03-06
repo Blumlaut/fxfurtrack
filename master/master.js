@@ -10,8 +10,9 @@ const PORT = process.env.PORT || 3000;
 // Configure the Redis queue
 const queue = new Bee('metadata-extraction', {
   redis: {
-    host: 'redis', // Name of the Redis service in Docker Compose
-    port: 6379,
+    host: process.env.REDIS_HOST || 'redis', // Name of the Redis service in Docker Compose
+    port: process.env.REDIS_PORT || 6379,
+    db: process.env.REDIS_DB || 0
   },
 });
 

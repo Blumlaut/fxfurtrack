@@ -2,7 +2,11 @@ const Bee = require('bee-queue');
 const Redis = require('ioredis');
 const https = require('https');
 
-const redisConfig = { host: 'redis', port: 6379 };
+const redisConfig = { 
+    host: process.env.REDIS_HOST || 'redis', 
+    port: process.env.REDIS_PORT || 6379,
+    db: process.env.REDIS_DB || 0
+};
 const redisClient = new Redis(redisConfig);
 const queue = new Bee('metadata-extraction', { redis: redisConfig });
 
@@ -174,7 +178,7 @@ queue.process(async (job) => {
     } else if (url.includes("/index/")) {
         const tag = url.split("/index/")[1];
         result = await processTagMetadata(url, tag);
-    }
+    } else
     
     if (!result) return { status: 'error', message: 'No metadata found' };
     cacheResult(url, result);
