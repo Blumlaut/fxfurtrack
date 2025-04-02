@@ -75,28 +75,25 @@ const processPostMetadata = async (url) => {
 const processTagMetadata = async (url, tag) => {
     console.log('Fetching metadata for tag', tag);
     const { posts, tagmeta } = await fetchJSON(`https://solar.furtrack.com/get/index/${tag}`);
-    let tagName
-    if (tagmeta) {
-        tagName = capitalize(tagmeta.tagTitle)
-    } else if (tag.includes('+')) {
+    let tagName;
+    if (tagmeta)
+        tagName = capitalize(tagmeta.tagTitle);
+    else if (tag.includes('+')) {
         // if tag contains a "+", consider it multiple tags
         const tags = tag.split('+');
-        tagName = tags.join(' + ')
-
+        tagName = tags.join(' + ');
     }
     if (!posts) return { status: 'error', message: 'Invalid Tag' };
 
-    let imageURL
-    let post
+    let imageURL, post;
     if (posts.length >= 1) {
         const mostUpvotedPost = posts.reduce((max, obj) => (obj.cv > max.cv ? obj : max), posts[0]);
-        const postId = mostUpvotedPost.postId
+        const postId = mostUpvotedPost.postId;
 
-        const data = await fetchJSON(`https://solar.furtrack.com/view/post/${postId}`)
-        post = data.post
+        const data = await fetchJSON(`https://solar.furtrack.com/view/post/${postId}`);
+        post = data.post;
         imageURL = `https://orca2.furtrack.com/gallery/${post.submitUserId}/${post.postId}-${post.metaFingerprint}.${post.metaFiletype}`;
     }
-
 
     return {
         url: `https://furtrack.com${url}`,
