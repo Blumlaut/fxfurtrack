@@ -63,7 +63,25 @@ app.get('*', async (req, res) => {
       '<meta name="theme-color" content="#48166a">';
     const templateWithMetatags = redirectTemplate.replace("<!-- METATAGS HERE -->", metatags);
 
-    res.send(ejs.render(templateWithMetatags, {result: result}));
+    let headline = result.metadata[0].content;
+
+    if (result.rawTags) {
+      headline = "";
+      tags = result.rawTags.split("+");
+      tags.forEach(tag => {
+        let parts = tag.split(":");
+        if (parts.length > 1) {
+          headline += `<span class="tag ${parts[0]}">${parts[1]}</span>`;
+        } else {
+          headline += `<span class="tag">${tag}</span>`;
+        }
+      });
+    }
+
+    res.send(ejs.render(templateWithMetatags, {data: {
+      url: result.url,
+      headline: headline,
+    }}));
   });
 
 });
