@@ -57,11 +57,10 @@ app.get('*', async (req, res) => {
 
     console.log(`Job ${job.id} succeeded.`);
 
-    let metatags =
+    const metatags =
       result.metadata.map(tag => `<meta property="${tag.property}" content="${tag.content}">`).join('\n') +
       result.twitter.map(tag => `<meta name="${tag.name}" content="${tag.content}">`).join('\n') +
       '<meta name="theme-color" content="#48166a">';
-    const templateWithMetatags = redirectTemplate.replace("<!-- METATAGS HERE -->", metatags);
 
     let headline = result.metadata[0].content;
 
@@ -78,9 +77,10 @@ app.get('*', async (req, res) => {
       });
     }
 
-    res.send(ejs.render(templateWithMetatags, {data: {
+    res.send(ejs.render(redirectTemplate, {data: {
       url: result.url,
       headline: headline,
+      metatags: metatags,
     }}));
   });
 
