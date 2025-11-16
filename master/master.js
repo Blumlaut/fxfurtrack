@@ -23,9 +23,9 @@ const redirectTemplate = (fs.readFileSync(path.join(__dirname, 'public/redirect_
 app.use(express.json());
 
 // Serve static files
-app.use("*/assets", express.static(__dirname + '/public/assets'));
+app.use('/assets', express.static(__dirname + '/public/assets'));
 
-app.get('*', async (req, res) => {
+app.get(/.*/, async (req, res) => {
   const url = req.originalUrl;
   if (!url) {
     return res.status(400).send('URL is required');
