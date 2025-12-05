@@ -32,7 +32,24 @@ const fetchParameters = { credentials: "include", headers: fetchHeaders, method:
 
 // Utility Functions
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
-const fetchJSON = async url => (await fetch(url, fetchParameters)).json();
+const fetchJSON = async url => {
+    try {
+        const response = await fetch(url, fetchParameters);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Fetch failed for URL: ${url}`, error.message);
+        // Print the response text when json() fails
+        if (error.message.includes('json')) {
+            // Capture response body before throwing error
+            const responseText = await response.text();
+            console.error(`Response body:`, responseText);
+        }
+        throw error;
+    }
+};
 const cacheResult = (key, data) => redisClient.setex(key, 86400, JSON.stringify(data));
 const extractTags = (tags, prefix) => tags.filter(tag => tag.tagName?.startsWith(prefix)).map(tag => tag.tagName.split(':')[1]);
 
@@ -152,33 +169,41 @@ const generateTwitterMetadata = (title, description, imageURL = '', cardType = '
 
 
 queue.on('failed', (job, err) => {
-    console.log(`Job ${job.id} failed with ${err.stack}`);
+    console.error(`Job ${job.id} failed with error:`, err.message);
+    console.error(`Job data:`, job.data);
+    console.error(`Stack trace:`, err.stack);
 });
 
 queue.process(async (job) => {
-    const url = job.data.url.replace('/uploads/', '/photography/');
-    console.log('Processing job', `https://furtrack.com${url}`);
-    
-    const cachedData = await redisClient.get(url);
-    if (cachedData) return JSON.parse(cachedData);
-    
-    let result;
-    if (getPostIdFromUrl(url)) {
-        result = await processPostMetadata(url);
-    } else if (url.includes('/user/') && !url.includes("album")) {
-        const username = url.split('/user/')[1].split('/')[0];
-        result = await processUserMetadata(url, username);
-    } else if (url.includes("album")) {
-        const username = url.split('/user/')[1].split('/')[0];
-        const albumId = url.split('-').pop();
-        result = await processAlbumMetadata(url, username, albumId);
-    } else if (url.includes("/index/")) {
-        const tag = url.split("/index/")[1];
-        result = await processTagMetadata(url, tag);
-        result.rawTags = tag;
+    try {
+        const url = job.data.url.replace('/uploads/', '/photography/');
+        console.log('Processing job', `https://furtrack.com${url}`);
+        
+        const cachedData = await redisClient.get(url);
+        if (cachedData) return JSON.parse(cachedData);
+        
+        let result;
+        if (getPostIdFromUrl(url)) {
+            result = await processPostMetadata(url);
+        } else if (url.includes('/user/') && !url.includes("album")) {
+            const username = url.split('/user/')[1].split('/')[0];
+            result = await processUserMetadata(url, username);
+        } else if (url.includes("album")) {
+            const username = url.split('/user/')[1].split('/')[0];
+            const albumId = url.split('-').pop();
+            result = await processAlbumMetadata(url, username, albumId);
+        } else if (url.includes("/index/")) {
+            const tag = url.split("/index/")[1];
+            result = await processTagMetadata(url, tag);
+            result.rawTags = tag;
+        }
+        
+        if (!result) return { status: 'error', message: 'No metadata found' };
+        cacheResult(url, result);
+        return result;
+    } catch (error) {
+        console.error(`Job ${job.id} processing failed for URL: ${job.data.url}`, error.message);
+        console.error(`Stack trace:`, error.stack);
+        throw error; // Re-throw to ensure job is properly marked as failed
     }
-    
-    if (!result) return { status: 'error', message: 'No metadata found' };
-    cacheResult(url, result);
-    return result;
 });
