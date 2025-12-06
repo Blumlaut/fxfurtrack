@@ -7,9 +7,9 @@ services:
       - redis
     environment:
       - NODE_ENV=production
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_DB=${REDIS_DB}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_DB=${REDIS_DB:-0}
     restart: always
 
   worker:
@@ -19,9 +19,9 @@ services:
     environment:
       - NODE_ENV=production
       - TOKEN=${TOKEN}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_DB=${REDIS_DB}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_DB=${REDIS_DB:-0}
     deploy:
       replicas: 2  # You can change the number of replicas to scale workers
     restart: always
