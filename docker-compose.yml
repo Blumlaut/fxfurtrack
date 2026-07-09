@@ -17,8 +17,9 @@ services:
     healthcheck:
       # Live check: submits a real job and waits for a worker response.
       # Catches stuck workers, deadlocks, and full pipeline failures.
+      # Runs every 15min — FurTrack API is rate-limited and cache lasts 24h.
       test: ["CMD", "curl", "-sf", "--max-time", "25", "http://localhost:3000/health/live"]
-      interval: 30s
+      interval: 15m
       timeout: 25s
       retries: 3
       start_period: 15s

@@ -39,16 +39,89 @@ app.get('/health', async (req, res) => {
 });
 
 /**
+ * Hardcoded popular tags scraped from the FurTrack API.
+ * Used to generate random health check URLs so we exercise
+ * different API paths and avoid hitting stale cache.
+ */
+const HEALTH_EVENTS = [
+  'anthrocon', 'midwest_furfest', 'eurofurence', 'further_confusion',
+  'nordic_fuzz_con', 'furnal_equinox', 'confuzzled',
+  'biggest_little_fur_con', 'anthro_new_england', 'furry_fiesta',
+  'megaplex', 'londonfurs', 'anthro_northwest', 'furpocalypse',
+  'furry_weekend_atlanta',
+];
+
+const HEALTH_PHOTOGRAPHERS = [
+  'hyper', 'fnmwolf', 'dairishgoat', 'linglingfennec', 'tullem_studios',
+  'blue_hasia', 'yellyxp', 'lunoswolf', 'colbythehusky', 'rictar_rat',
+  'slumberfoxvisions', 'rainrat', 'captain_chaotika', 'ryker_husky',
+  'tobee', 'nightdragon0', 'kurrikage', 'varekwolf', 'purplefox',
+];
+
+const HEALTH_CHARACTERS = [
+  'searcher_coyote', 'zarafa', 'noah_(oranwolf)', 'zane_(rito)',
+  'sox_(sergal)', 'jesse_bluefox', 'tullem', 'jax_hyena_(yeenexpress)',
+  'white_wolf_(arctic_wolf)', 'cleff', 'dexter_wolf', 'andrew_(maine_coon)',
+  'guguke', 'chevron', 'syber_the_shadow_tiger', 'jd_puppy',
+  'keanu_(shark_dog)', 'raze',
+];
+
+const HEALTH_SPECIES = [
+  'canine', 'feline', 'fox', 'wolf', 'dragon', 'hybrid',
+  'husky', 'big_cat', 'deer', 'tiger', 'hyena',
+];
+
+/**
+ * Picks a random element from an array.
+ */
+function rand(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/**
+ * Generates a random /index/ URL by picking tags at random.
+ * Sometimes single, sometimes combined — keeps FurTrack from caching.
+ */
+function generateHealthTestUrl() {
+  const roll = Math.random();
+
+  if (roll < 0.2) {
+    // 20% — species only
+    return `/index/species:${rand(HEALTH_SPECIES)}`;
+  } else if (roll < 0.4) {
+    // 20% — event only
+    return `/index/event:${rand(HEALTH_EVENTS)}`;
+  } else if (roll < 0.55) {
+    // 15% — event + photographer
+    return `/index/event:${rand(HEALTH_EVENTS)}+photographer:${rand(HEALTH_PHOTOGRAPHERS)}`;
+  } else if (roll < 0.7) {
+    // 15% — event + character
+    return `/index/event:${rand(HEALTH_EVENTS)}+character:${rand(HEALTH_CHARACTERS)}`;
+  } else if (roll < 0.8) {
+    // 10% — photographer only
+    return `/index/photographer:${rand(HEALTH_PHOTOGRAPHERS)}`;
+  } else if (roll < 0.9) {
+    // 10% — character only
+    return `/index/character:${rand(HEALTH_CHARACTERS)}`;
+  } else {
+    // 10% — species + character
+    return `/index/species:${rand(HEALTH_SPECIES)}+character:${rand(HEALTH_CHARACTERS)}`;
+  }
+}
+
+/**
  * Live health check — submits a real job and waits for a response.
- * Detects stuck workers, deadlocks, and full pipeline failures.
+ * Generates a random test URL each round so we exercise different
+ * FurTrack API paths and avoid stale cache.
  */
 app.get('/health/live', async (req, res) => {
-  const testUrl = '/index/species:canine';
   const liveTimeout = parseInt(process.env.LIVE_HEALTH_TIMEOUT) || 20000;
 
   try {
     const client = queue.client;
     await client.ping();
+
+    const testUrl = generateHealthTestUrl();
 
     const job = await queue.createJob({ url: testUrl }).save();
     let responded = false;
@@ -84,7 +157,7 @@ app.get('/health/live', async (req, res) => {
           status: 'ok',
           redis: 'connected',
           worker: 'responsive',
-          jobTime: result._jobTime || 'unknown',
+          testUrl,
           timestamp: new Date().toISOString()
         });
       }
