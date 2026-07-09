@@ -4,18 +4,30 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     environment:
       - NODE_ENV=production
       - REDIS_HOST=${REDIS_HOST:-redis}
       - REDIS_PORT=${REDIS_PORT:-6379}
       - REDIS_DB=${REDIS_DB:-0}
-    restart: always
+      - REQUEST_TIMEOUT=30000
+      - LIVE_HEALTH_TIMEOUT=20000
+    restart: unless-stopped
+    healthcheck:
+      # Live check: submits a real job and waits for a worker response.
+      # Catches stuck workers, deadlocks, and full pipeline failures.
+      test: ["CMD", "curl", "-sf", "--max-time", "25", "http://localhost:3000/health/live"]
+      interval: 30s
+      timeout: 25s
+      retries: 3
+      start_period: 15s
 
   worker:
     build: ./worker
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     environment:
       - NODE_ENV=production
       - TOKEN=${TOKEN}
@@ -24,9 +36,22 @@ services:
       - REDIS_DB=${REDIS_DB:-0}
     deploy:
       replicas: 2  # You can change the number of replicas to scale workers
-    restart: always
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
   redis:
     image: "redis:alpine"
     ports:
       - "6379:6379"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

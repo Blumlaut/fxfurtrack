@@ -8,6 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+# Copy health check script
+COPY healthcheck.js ./
+
 # Copy the rest of the application
 COPY . .
 
