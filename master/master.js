@@ -228,8 +228,8 @@ app.get(/.*/, async (req, res) => {
     return res.sendStatus(404);
   }
 
-  // ignore URLs that dont start with either /p/, /user/ or /index/
-  if (!url.match(/^\/(p|user|index)/)) {
+  // ignore URLs that dont start with /p/, /home/, /user/ or /index/
+  if (!url.match(/^\/(p|home|user|index)/)) {
     return res.status(404).send('Invalid URL');
   }
   console.log(req.originalUrl)
